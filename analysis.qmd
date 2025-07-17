@@ -16,7 +16,8 @@ library(marginaleffects)
 library(easystats)
 
 x <- read_csv("https://raw.githubusercontent.com/PPBDS/bootcamp/refs/heads/master/_internal/data/resume.csv",
-        show_col_types = FALSE)
+        show_col_types = FALSE) |> 
+            mutate(call = as.factor(call))
 ```
 
 <!-- name indicates applicant's first name.
@@ -40,3 +41,52 @@ honors: Did the resume mention some honors?
 holes: Does the resume have some employment holes?
 
 special: Does the resume mention some special skills? -->
+
+
+
+```{r}
+logistic_reg() |> 
+    fit(as.factor(call) ~ city, data = x) |> 
+    tidy(conf.int = TRUE)
+```
+
+
+```{r}
+logistic_reg() |> 
+    fit(as.factor(call) ~ ethnicity, data = x) |> 
+    tidy(conf.int = TRUE)
+```
+
+```{r}
+logistic_reg() |> 
+    fit(as.factor(call) ~ city + ethnicity, data = x) |> 
+    tidy(conf.int = TRUE)
+```
+
+
+```{r}
+logistic_reg() |> 
+    fit(as.factor(call) ~ gender + city + ethnicity + quality + jobs + special, data = x) |> 
+    tidy(conf.int = TRUE)
+```
+
+
+```{r}
+logistic_reg() |> 
+    fit(as.factor(call) ~ gender + city + ethnicity + special, data = x) |> 
+    tidy(conf.int = TRUE)
+```
+
+This is my data generating mechanism. 
+
+$$
+\begin{equation}
+\begin{aligned}
+\text{logit}(\Pr(\text{call} = 1)) =\; & -2.75 
+\; - \; 0.13 \cdot \text{male} 
+\; - \; 0.46 \cdot \text{chicago} \\
+& + \; 0.45 \cdot \text{caucasian} 
+\; + \; 0.82 \cdot \text{special}
+\end{aligned}
+\end{equation}
+$$
